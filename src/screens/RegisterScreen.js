@@ -10,11 +10,11 @@ import {
   StyleSheet,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Ionicons} from 'react-native-vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons'; // Importación corregida
 import COLORS from '../constants/colors';
 import {urlRest, CLIENT_ID, CLIENT_SECRET} from '../api/api';
 
-const Signup = ({navigation}) => {
+const Register = ({navigation}) => {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +23,7 @@ const Signup = ({navigation}) => {
   const handleSignup = () => {
     console.log('Signup:', nombre, email, password);
 
-    let urlapi = urlRest + 'api/RegisterMovil';
+    const urlapi = `${urlRest}api/RegisterMovil`; // Uso de template literals para mayor claridad
     console.log(urlapi);
 
     fetch(urlapi, {
@@ -44,18 +44,18 @@ const Signup = ({navigation}) => {
       .then(data => {
         console.log(data);
         if (data.status === 'ok') {
-          console.log('Registro exitoso:', data.msg);
           Alert.alert(
             'Registro Exitoso',
             'Se creó la cuenta de manera correcta',
             [{text: 'OK', onPress: () => navigation.navigate('LoginForm')}],
           );
         } else {
-          console.log('Error en el registro:', data.msg);
+          Alert.alert('Error en el registro', data.msg || 'Hubo un error');
         }
       })
       .catch(error => {
         console.error('Error al conectar con la API:', error);
+        Alert.alert('Error', 'No se pudo conectar al servidor.');
       });
   };
 
@@ -71,6 +71,7 @@ const Signup = ({navigation}) => {
               <Text style={styles.subtitle}>¡Únete a nosotros hoy!</Text>
             </View>
 
+            {/* Nombre completo */}
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Nombre completo</Text>
               <View style={styles.inputWrapper}>
@@ -84,6 +85,7 @@ const Signup = ({navigation}) => {
               </View>
             </View>
 
+            {/* Email */}
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Email</Text>
               <View style={styles.inputWrapper}>
@@ -98,13 +100,14 @@ const Signup = ({navigation}) => {
               </View>
             </View>
 
+            {/* Contraseña */}
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Contraseña</Text>
               <View style={styles.inputWrapper}>
                 <TextInput
                   placeholder="Ingresa contraseña"
                   placeholderTextColor={COLORS.black}
-                  secureTextEntry={isPasswordShown}
+                  secureTextEntry={!isPasswordShown}
                   value={password}
                   onChangeText={setPassword}
                   style={styles.input}
@@ -121,12 +124,14 @@ const Signup = ({navigation}) => {
               </View>
             </View>
 
+            {/* Botón de registro */}
             <TouchableOpacity
               style={styles.signupButton}
               onPress={handleSignup}>
               <Text style={styles.signupButtonText}>Registrarse</Text>
             </TouchableOpacity>
 
+            {/* Enlace a iniciar sesión */}
             <View style={styles.loginContainer}>
               <Text style={styles.loginText}>¿Ya tienes una cuenta?</Text>
               <Pressable onPress={() => navigation.navigate('LoginForm')}>
@@ -226,4 +231,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Signup;
+export default Register;

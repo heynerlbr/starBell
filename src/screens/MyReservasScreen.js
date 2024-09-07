@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState, useContext} from 'react';
 import {
   Text,
   StyleSheet,
@@ -8,60 +8,64 @@ import {
   Alert,
   ImageBackground,
   Dimensions,
-} from "react-native";
-import { urlRest, CLIENT_ID, CLIENT_SECRET } from "../api/api";
-import Icon from "react-native-vector-icons/FontAwesome";
-import SweetAlert from "react-native-sweet-alert";
+} from 'react-native';
+import {urlRest, CLIENT_ID, CLIENT_SECRET} from '../api/api';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {AuthContext} from '../context/AuthContext'; // Asegúrate de ajustar la ruta
 
-const ElementoScreen = ({ route, navigation }) => {
+const ElementoScreen = ({route, navigation}) => {
   const [reservas, setReservas] = useState([]);
 
-  const cancelarReserva = (id) => {
+  const {userProfile} = useContext(AuthContext); // Usa el contexto
+
+  console.log(userProfile);
+
+  const cancelarReserva = id => {
     Alert.alert(
-      "Confirmación",
-      "¿Estás seguro de que deseas cancelar la reserva?",
+      'Confirmación',
+      '¿Estás seguro de que deseas cancelar la reserva?',
       [
         {
-          text: "Cancelar",
-          style: "cancel",
+          text: 'Cancelar',
+          style: 'cancel',
         },
         {
-          text: "Sí",
+          text: 'Sí',
           onPress: () => cancelarReservaConfirmada(id),
         },
       ],
-      { cancelable: false }
+      {cancelable: false},
     );
   };
 
-  const cancelarReservaConfirmada = (id) => {
+  const cancelarReservaConfirmada = id => {
     const urlapi = `${urlRest}api/CancelarReservaApi`;
     console.log(urlapi);
     fetch(urlapi, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-Client-ID": CLIENT_ID,
-        "X-Client-Secret": CLIENT_SECRET,
+        'Content-Type': 'application/json',
+        'X-Client-ID': CLIENT_ID,
+        'X-Client-Secret': CLIENT_SECRET,
       },
       body: JSON.stringify({
         id: id,
       }),
     })
-      .then((response) => response.json())
-      .then((data) => {
+      .then(response => response.json())
+      .then(data => {
         console.log(data);
-        if (data.Tipo === "success") {
+        if (data.Tipo === 'success') {
           fetchMyReservas();
         }
       })
-      .catch((error) => {
-        console.log("Error fetching element data:", error);
+      .catch(error => {
+        console.log('Error fetching element data:', error);
       });
   };
 
-  const verDetalle = (item) => {
-    navigation.navigate("MyDetalleReserva", {
+  const verDetalle = item => {
+    navigation.navigate('MyDetalleReserva', {
       reserva: item,
       id: item.id_elemento,
     });
@@ -69,25 +73,26 @@ const ElementoScreen = ({ route, navigation }) => {
 
   const fetchMyReservas = () => {
     const urlapi = `${urlRest}api/obtenerMisReservasApi`;
+    console.log('este', userProfile.id);
     console.log(urlapi);
     fetch(urlapi, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-Client-ID": CLIENT_ID,
-        "X-Client-Secret": CLIENT_SECRET,
+        'Content-Type': 'application/json',
+        'X-Client-ID': CLIENT_ID,
+        'X-Client-Secret': CLIENT_SECRET,
       },
       body: JSON.stringify({
-        id: 2,
+        id: userProfile.id,
       }),
     })
-      .then((response) => response.json())
-      .then((data) => {
+      .then(response => response.json())
+      .then(data => {
         console.log(data);
         setReservas(data.reservas);
       })
-      .catch((error) => {
-        console.log("Error fetching element data:", error);
+      .catch(error => {
+        console.log('Error fetching element data:', error);
       });
   };
 
@@ -95,7 +100,7 @@ const ElementoScreen = ({ route, navigation }) => {
     fetchMyReservas();
   }, []);
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({item}) => (
     <View style={styles.itemContainer}>
       <View style={styles.row}>
         <View style={styles.column}>
@@ -131,14 +136,12 @@ const ElementoScreen = ({ route, navigation }) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.verDetalleButton]}
-          onPress={() => verDetalle(item)}
-        >
+          onPress={() => verDetalle(item)}>
           <Text style={styles.buttonText}>Ver Detalle</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.cancelarReservaButton]}
-          onPress={() => cancelarReserva(item.id)}
-        >
+          onPress={() => cancelarReserva(item.id)}>
           <Text style={styles.buttonText}>Cancelar Reserva</Text>
         </TouchableOpacity>
       </View>
@@ -147,15 +150,14 @@ const ElementoScreen = ({ route, navigation }) => {
 
   return (
     <ImageBackground
-      source={require("../../assets/imagenes/background.png")}
-      style={styles.backgroundImage}
-    >
+      source={require('../../assets/imagenes/background.png')}
+      style={styles.backgroundImage}>
       <View style={styles.container}>
         <Text style={styles.title}>Mis Reservas</Text>
         <FlatList
           data={reservas}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.flatListContainer}
         />
       </View>
@@ -166,22 +168,22 @@ const ElementoScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: "center",
-    color: "#007bff",
+    textAlign: 'center',
+    color: '#007bff',
   },
   itemContainer: {
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 10,
     marginBottom: 15,
     padding: 20,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -191,50 +193,50 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 10,
   },
   column: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
   },
   label: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 5,
-    color: "#007bff",
+    color: '#007bff',
   },
   text: {
-    textAlign: "center",
-    color: "#555",
+    textAlign: 'center',
+    color: '#555',
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 15,
   },
   button: {
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    width: "45%", // Ajustar el ancho de los botones para evitar que se toquen
+    width: '45%', // Ajustar el ancho de los botones para evitar que se toquen
     elevation: 2,
   },
   verDetalleButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: '#007bff',
   },
   cancelarReservaButton: {
-    backgroundColor: "#dc3545",
+    backgroundColor: '#dc3545',
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   backgroundImage: {
     flex: 1,
-    resizeMode: "cover",
-    justifyContent: "center",
+    resizeMode: 'cover',
+    justifyContent: 'center',
   },
 });
 

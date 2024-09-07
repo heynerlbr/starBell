@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -8,20 +8,71 @@ import {
 } from 'react-native';
 import {Avatar} from 'react-native-elements';
 import COLORS from '../constants/colors';
-import {obtenerPerfilUsuario} from '../api/api';
+import {obtenerPerfilUsuario} from '../api/api'; // Asegúrate de que esto esté correctamente configurado
 import BtnLogout from '../componentes/BtnLogout';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
+import {urlRest} from '../api/api'; // Ajusta según sea necesario
+import {AuthContext} from '../context/AuthContext'; // Asegúrate de ajustar la ruta
 
-const Perfil = ({route}) => {
-  // Obtener el perfil del usuario
-  const userProfile = obtenerPerfilUsuario() || {};
+const Perfil = () => {
+  const navigation = useNavigation();
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Valores predeterminados
-  const defaultName = 'Nombre no disponible';
-  const defaultEmail = 'Email no disponible';
+  // Verifica la autenticación y obtiene datos del usuario
+  const checkAuthStatus = async () => {
+    const token = await AsyncStorage.getItem('authToken');
 
-  // Asignar valores del perfil del usuario o valores predeterminados
-  const name = userProfile.name || defaultName;
-  const email = userProfile.email || defaultEmail;
+    if (!token) {
+      console.log('No estás autenticado');
+      navigation.navigate('Login');
+      return false;
+    }
+
+    try {
+      const urlapi = `${urlRest}api/user`;
+      const response = await fetch(urlapi, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        const userData = await response.json();
+        console.log('Usuario autenticado:', userData);
+        setUserData(userData); // Actualiza el estado con los datos del usuario
+        return true;
+      } else {
+        console.log('Sesión expirada o token inválido');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error al verificar la sesión:', error);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const authenticateUser = async () => {
+      const isAuthenticated = await checkAuthStatus();
+      if (!isAuthenticated) {
+        navigation.navigate('Login');
+      } else {
+        setIsLoading(false); // Cambia el estado de carga a falso cuando la autenticación esté completa
+      }
+    };
+
+    authenticateUser();
+  }, [navigation]);
+
+  if (isLoading) {
+    return <Text>Cargando...</Text>; // Puedes mejorar esto con un componente de carga
+  }
+
+  const name = userData?.name || 'Nombre no disponible';
+  const email = userData?.email || 'Email no disponible';
 
   return (
     <ImageBackground

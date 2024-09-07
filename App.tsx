@@ -1,16 +1,19 @@
 import React from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { NavigationContainer } from "@react-navigation/native";
-import Navigation from "./src/navigations/Navigation";
+import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import Navigation from './src/navigations/Navigation';
+import { AuthProvider } from './src/context/AuthContext'; // Asegúrate de ajustar la ruta
 
 function App() {
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <NavigationContainer>
-        <Navigation />
-      </NavigationContainer>
-    </SafeAreaView>
+    <AuthProvider>
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" />
+        <NavigationContainer>
+          <Navigation />
+        </NavigationContainer>
+      </SafeAreaView>
+    </AuthProvider>
   );
 }
 

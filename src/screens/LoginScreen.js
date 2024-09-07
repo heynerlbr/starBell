@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   View,
   Text,
@@ -11,18 +11,49 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CheckBox from '@react-native-community/checkbox';
 import COLORS from '../constants/colors';
+import {urlRest, CLIENT_ID, CLIENT_SECRET} from '../api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AuthContext} from '../context/AuthContext'; // Asegúrate de ajustar la ruta
 
 const Login = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const {loginA} = useContext(AuthContext); // Usa el contexto
 
-  const handleSubmit = () => {
-    console.log('Iniciar sesión:', username, password);
-    navigation.navigate('Perfil');
+  const handleLogin = async () => {
+    try {
+      const urlapi = `${urlRest}api/LoginMovil`; // Uso de template literals para mayor claridad
+      console.log(username);
+
+      const response = await fetch(urlapi, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: username,
+          password: password,
+        }),
+      });
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+
+      if (data.token) {
+        userProfile = data.user;
+        await AsyncStorage.setItem('authToken', data.token); // Guardar token
+        console.log('Login exitoso');
+        loginA(data.user); // Actualiza el contexto con el usuario autenticado
+        navigation.navigate('Perfil'); // Navegar a la pantalla del perfil
+      } else {
+        console.log('Error en el login', data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
-
   return (
     <ImageBackground
       source={require('../../assets/imagenes/background.png')}
@@ -79,7 +110,7 @@ const Login = ({navigation}) => {
             <Text style={styles.checkboxLabel}>Recuérdame</Text>
           </View>
 
-          <TouchableOpacity onPress={handleSubmit} style={styles.loginButton}>
+          <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
             <Text style={styles.loginButtonText}>Login</Text>
           </TouchableOpacity>
 
@@ -87,7 +118,7 @@ const Login = ({navigation}) => {
 
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>¿No tengo una cuenta?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
               <Text style={[styles.signupText, styles.signupLink]}>
                 Registro
               </Text>
