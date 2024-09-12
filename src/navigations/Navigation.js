@@ -5,6 +5,7 @@ import LoginNavigation from './LoginNavigation';
 import LugaresNavigation from './LugaresNavigation';
 import MyReservasNavigation from './MyReservasNavigation';
 import UserProfileScreen from '../screens/PerfilScreen';
+import favoritosScreen from '../screens/favoritosScreen';
 import {AuthContext} from '../context/AuthContext'; // Asegúrate de ajustar la ruta
 
 const Tab = createBottomTabNavigator();
@@ -51,6 +52,16 @@ const Navigation = () => {
               tabBarLabel: 'Mis reservas',
               tabBarIcon: ({color, size}) => (
                 <FontAwesome5 name="heart" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="Favoritos"
+            component={favoritosScreen}
+            options={{
+              tabBarLabel: 'Favoritos',
+              tabBarIcon: ({color, size}) => (
+                <FontAwesome5 name="star" size={size} color={color} />
               ),
             }}
           />

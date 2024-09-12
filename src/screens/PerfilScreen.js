@@ -12,7 +12,7 @@ import {obtenerPerfilUsuario} from '../api/api'; // Asegúrate de que esto esté
 import BtnLogout from '../componentes/BtnLogout';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-import {urlRest} from '../api/api'; // Ajusta según sea necesario
+import {urlRest, userProfile} from '../api/api'; // Ajusta según sea necesario
 import {AuthContext} from '../context/AuthContext'; // Asegúrate de ajustar la ruta
 
 const Perfil = () => {
@@ -43,6 +43,8 @@ const Perfil = () => {
         const userData = await response.json();
         console.log('Usuario autenticado:', userData);
         setUserData(userData); // Actualiza el estado con los datos del usuario
+        // userProfile = userData;
+        AsyncStorage.setItem('userId', JSON.stringify(userData.id));
         return true;
       } else {
         console.log('Sesión expirada o token inválido');

@@ -8,61 +8,24 @@ import {
   ImageBackground,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Para los iconos de estrella
-import {urlRest, CLIENT_ID, CLIENT_SECRET, userProfile} from '../api/api';
+import {urlRest, CLIENT_ID, CLIENT_SECRET} from '../api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Para obtener el ID del usuario
 
-const ListLugaresScreen = ({route, navigation}) => {
-  const [lugares, setLugares] = useState([]);
-  const [municipioId, setMunicipioId] = useState(null);
-  const [reservaId, setReservaId] = useState(null);
-  const [favorites, setFavorites] = useState([]);
+const ListFavoritosScreen = ({navigation}) => {
+  const [favoritos, setFavoritos] = useState([]);
 
   useEffect(() => {
-    const {municipioId, reservaId} = route.params;
-    setMunicipioId(municipioId);
-    setReservaId(reservaId);
-    fetchObjectsWithIds(municipioId, reservaId);
-  }, [route.params]);
+    fetchFavoritos();
+  }, []);
 
-  const fetchObjectsWithIds = (municipioId, reservaId) => {
-    if (municipioId && reservaId) {
-      let urlapi = `${urlRest}api/obtenerlugaresFiltrados`;
-      fetch(urlapi, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Client-ID': CLIENT_ID,
-          'X-Client-Secret': CLIENT_SECRET,
-        },
-        body: JSON.stringify({
-          idMunicipio: municipioId,
-          idTipoReserva: reservaId,
-        }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          setLugares(data.lugaresFiltrados);
-        })
-        .catch(error => {
-          console.error(
-            'Error al conectar con la API para obtener objetos:',
-            error,
-          );
-        });
-    } else {
-      console.error('Los IDs proporcionados no son válidos.');
-    }
-  };
-
-  // Función para agregar/quitar favoritos
-  const toggleFavorite = async lugarId => {
+  const fetchFavoritos = async () => {
     const userId = await AsyncStorage.getItem('userId'); // Obtén el ID del usuario logeado
     if (!userId) {
       console.error('El ID del usuario no está disponible');
       return;
     }
 
-    let urlapi = `${urlRest}api/agregarAFavoritos`;
+    let urlapi = `${urlRest}api/obtenerFavoritos`;
 
     console.log(urlapi);
 
@@ -74,22 +37,15 @@ const ListLugaresScreen = ({route, navigation}) => {
         'X-Client-Secret': CLIENT_SECRET,
       },
       body: JSON.stringify({
-        lugarId: lugarId,
         userId: userId,
       }),
     })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          setFavorites(prevFavorites => {
-            if (prevFavorites.includes(lugarId)) {
-              return prevFavorites.filter(id => id !== lugarId);
-            } else {
-              return [...prevFavorites, lugarId];
-            }
-          });
+          setFavoritos(data.favoritos);
         } else {
-          console.error('Error al agregar a favoritos:', data.message);
+          console.error('Error al obtener los favoritos:', data.message);
         }
       })
       .catch(error => {
@@ -99,8 +55,6 @@ const ListLugaresScreen = ({route, navigation}) => {
 
   const handleItemPress = id => {
     navigation.navigate('ListElementos', {
-      municipioId: municipioId,
-      reservaId: reservaId,
       lugarId: id,
     });
   };
@@ -112,13 +66,7 @@ const ListLugaresScreen = ({route, navigation}) => {
       <View style={styles.itemContent}>
         <Text style={styles.itemName}>{item.nombre}</Text>
         <Text style={styles.itemAddress}>{item.direccion}</Text>
-        <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
-          <Icon
-            name={favorites.includes(item.id) ? 'star' : 'star-o'}
-            size={24}
-            color="#FFD700"
-          />
-        </TouchableOpacity>
+        <Icon name="star" size={24} color="#FFD700" />
       </View>
     </TouchableOpacity>
   );
@@ -129,7 +77,7 @@ const ListLugaresScreen = ({route, navigation}) => {
       style={styles.backgroundImage}>
       <View style={styles.container}>
         <FlatList
-          data={lugares}
+          data={favoritos}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.flatListContent}
@@ -185,4 +133,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListLugaresScreen;
+export default ListFavoritosScreen;
