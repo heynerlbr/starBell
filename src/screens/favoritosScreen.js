@@ -7,27 +7,31 @@ import {
   StyleSheet,
   ImageBackground,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Para los iconos de estrella
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {urlRest, CLIENT_ID, CLIENT_SECRET} from '../api/api';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Para obtener el ID del usuario
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ListFavoritosScreen = ({navigation}) => {
   const [favoritos, setFavoritos] = useState([]);
 
   useEffect(() => {
+    console.log('ListFavoritosScreen mounted');
     fetchFavoritos();
   }, []);
 
   const fetchFavoritos = async () => {
-    const userId = await AsyncStorage.getItem('userId'); // Obtén el ID del usuario logeado
+    console.log('Fetching favoritos');
+
+    const userId = await AsyncStorage.getItem('userId');
+    console.log('User ID:', userId); // Verificar el ID del usuario
+
     if (!userId) {
       console.error('El ID del usuario no está disponible');
       return;
     }
 
     let urlapi = `${urlRest}api/obtenerFavoritos`;
-
-    console.log(urlapi);
+    console.log('API URL:', urlapi); // Verificar la URL de la API
 
     fetch(urlapi, {
       method: 'POST',
@@ -36,12 +40,14 @@ const ListFavoritosScreen = ({navigation}) => {
         'X-Client-ID': CLIENT_ID,
         'X-Client-Secret': CLIENT_SECRET,
       },
-      body: JSON.stringify({
-        userId: userId,
-      }),
+      body: JSON.stringify({userId}),
     })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Response:', response); // Verificar respuesta antes de convertirla a JSON
+        return response.json();
+      })
       .then(data => {
+        console.log('Data:', data); // Verificar la data recibida
         if (data.success) {
           setFavoritos(data.favoritos);
         } else {
@@ -54,9 +60,7 @@ const ListFavoritosScreen = ({navigation}) => {
   };
 
   const handleItemPress = id => {
-    navigation.navigate('ListElementos', {
-      lugarId: id,
-    });
+    navigation.navigate('ListElementos', {lugarId: id});
   };
 
   const renderItem = ({item}) => (

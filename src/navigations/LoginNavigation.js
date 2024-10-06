@@ -15,11 +15,12 @@ const LoginNavigation = () => {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {backgroundColor: 'transparent'},
-        headerTintColor: '#fff',
+        headerTintColor: '#fff', // Color de los iconos y texto en el header
         headerTitleStyle: {
           fontWeight: 'bold',
         },
         headerTransparent: true,
+        headerTitleAlign: 'center', // Opcional: Alínea el título al centro
       }}>
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Register" component={RegisterFormScreen} />

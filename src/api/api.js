@@ -1,6 +1,7 @@
 export const urlRest = 'http://10.0.2.2:8000/';
 // export const urlRest = "http://127.0.0.1:8000/";
 // export const urlRest = "https://reservables.net/";
+// export const urlRest = 'http://startbell.reservables.net/';
 export const CLIENT_ID = '3';
 export const CLIENT_SECRET = 'wZp4tXyVtBgHMfwhH5cTGM7u7ttGJt4cS3iDOEms';
 

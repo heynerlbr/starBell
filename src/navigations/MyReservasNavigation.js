@@ -1,10 +1,10 @@
-import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import React from 'react';
+import {createStackNavigator} from '@react-navigation/stack';
 
-import MyReservasScreen from "../screens/MyReservasScreen";
-import MyDetalleReserva from "../screens/MyDetalleReservaScreen";
+import MyReservasScreen from '../screens/MyReservasScreen';
+import MyDetalleReserva from '../screens/MyDetalleReservaScreen';
 
-import { INFO_CLIENTE } from "../api/api";
+import {INFO_CLIENTE} from '../api/api';
 
 const Stack = createStackNavigator();
 
@@ -13,15 +13,15 @@ const LugaresNavigation = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: "transparent" },
-        headerTintColor: "#fff",
+        headerStyle: {backgroundColor: 'transparent'},
+        headerTintColor: '#fff', // Color de los iconos y texto en el header
         headerTitleStyle: {
-          fontWeight: "bold",
+          fontWeight: 'bold',
         },
         headerTransparent: true,
-      }}
-    >
-      <Stack.Screen name="MyReservasScreen" component={MyReservasScreen} />
+        headerTitleAlign: 'center', // Opcional: Alínea el título al centro
+      }}>
+      <Stack.Screen name="Mis reservas" component={MyReservasScreen} />
       <Stack.Screen name="MyDetalleReserva" component={MyDetalleReserva} />
     </Stack.Navigator>
   );

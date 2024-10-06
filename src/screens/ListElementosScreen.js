@@ -20,7 +20,18 @@ const ListElementosScreen = ({route, navigation}) => {
 
   const fetchElementos = () => {
     if (municipioId && reservaId && lugarId) {
+      console.log('ruta 1');
       const urlapi = `${urlRest}api/obtenerElementosFiltrados`;
+      console.log(urlapi);
+
+      var registro = JSON.stringify({
+        idMunicipio: municipioId,
+        idTipoReserva: reservaId,
+        idLugar: lugarId,
+      });
+
+      console.log(registro);
+
       fetch(urlapi, {
         method: 'POST',
         headers: {
@@ -28,11 +39,7 @@ const ListElementosScreen = ({route, navigation}) => {
           'X-Client-ID': CLIENT_ID,
           'X-Client-Secret': CLIENT_SECRET,
         },
-        body: JSON.stringify({
-          idMunicipio: municipioId,
-          idTipoReserva: reservaId,
-          idLugar: lugarId,
-        }),
+        body: registro,
       })
         .then(response => {
           if (!response.ok) {
@@ -41,6 +48,8 @@ const ListElementosScreen = ({route, navigation}) => {
           return response.json();
         })
         .then(data => {
+          console.log(data.elementosFiltrados);
+
           setElementos(data.elementosFiltrados);
         })
         .catch(error => {
@@ -50,6 +59,8 @@ const ListElementosScreen = ({route, navigation}) => {
           );
         });
     } else if (lugarId) {
+      console.log('ruta 2');
+
       const urlapi = `${urlRest}api/obtenerElementosFiltrados`;
       fetch(urlapi, {
         method: 'POST',
