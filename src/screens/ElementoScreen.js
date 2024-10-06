@@ -6,7 +6,6 @@ import {
   Dimensions,
   Image,
   Alert,
-  Button,
   Modal,
   TouchableOpacity,
   TextInput,
@@ -24,79 +23,70 @@ const ElementoScreen = ({route, navigation}) => {
   const [images, setImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedStartDate, setSelectedStartDate] = useState(new Date());
+  const [selectedEndDate, setSelectedEndDate] = useState(new Date());
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
 
-  const [ValidateDay, setValidateDay] = useState(0);
+  const [validateDay, setValidateDay] = useState(0);
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
   const {id} = route.params;
 
+  const detailsRef = useRef(null);
+
   const truncateText = (text, length) => {
-    if (text.length > length) {
-      return text.substring(0, length) + '...';
+    if (typeof text !== 'string') {
+      return '';
     }
-    return text;
+    return text.length > length ? text.substring(0, length) + '...' : text;
   };
 
-  const fetchElemento = () => {
+  const fetchElemento = async () => {
     if (!id || isNaN(id)) {
       Alert.alert('Error', 'ID inválido proporcionado.');
-      console.error('ID inválido proporcionado.');
       return;
     }
-    if (id) {
-      const urlapi = `${urlRest}api/obtenerInformacionElemento`;
-      fetch(urlapi, {
+
+    try {
+      const response = await fetch(`${urlRest}api/obtenerInformacionElemento`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Client-ID': CLIENT_ID,
           'X-Client-Secret': CLIENT_SECRET,
         },
-        body: JSON.stringify({
-          id: id,
-        }),
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log(data);
-          setElemento(data.elemento);
-          setImages(data.imagenes);
-        })
-        .catch(error => {
-          Alert.alert(
-            'Error',
-            'Failed to fetch element data. Please try again later.',
-          );
-          console.log('Error fetching element data:', error);
-        });
-    } else {
-      Alert.alert('Error', 'Invalid ID provided.');
-      console.error('Invalid ID provided.');
+        body: JSON.stringify({id}),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      setElemento(data.elemento);
+      setImages(data.imagenes);
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        'Failed to fetch element data. Please try again later.',
+      );
+      console.error('Error fetching element data:', error);
     }
   };
 
-  const validarDiaApi = fecha => {
+  const validarDiaApi = async fecha => {
     if (!id || isNaN(id)) {
       Alert.alert('Error', 'ID inválido proporcionado.');
-      console.error('ID inválido proporcionado.');
       return;
     }
-    if (id) {
-      console.log(id);
-      console.log(fecha);
-      const urlapi = `${urlRest}api/validarDiaApi`;
-      fetch(urlapi, {
+
+    try {
+      const response = await fetch(`${urlRest}api/validarDiaApi`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,84 +97,54 @@ const ElementoScreen = ({route, navigation}) => {
           id_elemento: id,
           fecha: fecha,
         }),
-      })
-        .then(response => {
-          return response.json();
-        })
-        .then(data => {
-          console.log(data);
-          setValidateDay(data.diaValido);
-          setHorariosDisponibles(data.horariosDisponibles);
-        })
-        .catch(error => {
-          Alert.alert(
-            'Error',
-            'Failed to fetch element data. Please try again later.',
-          );
-          console.log('Error fetching element data:', error);
-        });
-    } else {
-      Alert.alert('Error', 'Invalid ID provided.');
-      console.error('Invalid ID provided.');
+      });
+
+      const data = await response.json();
+      setValidateDay(data.diaValido);
+      setHorariosDisponibles(data.horariosDisponibles);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to validate date. Please try again later.');
+      console.error('Error validating date:', error);
     }
   };
 
-  //crear reserva
-
-  const crearReserva = () => {
-    // Validar que se haya proporcionado un objeto válido para el elemento
-    // if (!elemento || typeof elemento !== "object") {
-    //   Alert.alert("Error", "Elemento inválido proporcionado.");
-    //   console.error("Elemento inválido proporcionado.");
-    //   return;
-    // }
-
-    // Separar cada variable del objeto elemento
-
-    let row = JSON.stringify({
-      fecha: selectedDate.toISOString().split('T')[0],
+  const crearReserva = async () => {
+    const reservaData = {
+      fecha_inicio: selectedStartDate.toISOString().split('T')[0],
+      fecha_fin: selectedEndDate.toISOString().split('T')[0],
       id_elemento: id,
       hora_inicio: formatTime(startTime),
       hora_fin: formatTime(endTime),
       id_usuario_crea: '2',
-    });
-    console.log(row);
+    };
 
-    const urlapi = `${urlRest}api/CrearReservaApi`; // Asegúrate de que esta URL sea la correcta para tu API de Laravel
-    fetch(urlapi, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Client-ID': CLIENT_ID,
-        'X-Client-Secret': CLIENT_SECRET,
-      },
-      body: row,
-    })
-      .then(response => {
-        // if (!response.ok) {
-        //   throw new Error("Network response was not ok");
-        // }
-        return response.json();
-      })
-      .then(data => {
-        Alert.alert('Éxito', 'Se creó el elemento correctamente.');
-        console.log('Elemento creado:', data);
-        setModalVisible(false);
-      })
-      .catch(error => {
-        Alert.alert(
-          'Error',
-          'No se pudo crear el elemento. Por favor, inténtelo de nuevo más tarde.',
-        );
-        console.log('Error al crear el elemento:', error);
+    try {
+      const response = await fetch(`${urlRest}api/CrearReservaApi`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-ID': CLIENT_ID,
+          'X-Client-Secret': CLIENT_SECRET,
+        },
+        body: JSON.stringify(reservaData),
       });
+
+      const data = await response.json();
+      Alert.alert('Éxito', 'Se creó la reserva correctamente.');
+      console.log('Reserva creada:', data);
+      setModalVisible(false);
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        'No se pudo crear la reserva. Por favor, inténtelo de nuevo más tarde.',
+      );
+      console.error('Error al crear la reserva:', error);
+    }
   };
 
   const handleSubmit = () => {
-    validarDiaApi(selectedDate);
+    validarDiaApi(selectedStartDate);
   };
-
-  const detailsRef = useRef(null);
 
   useEffect(() => {
     fetchElemento();
@@ -225,18 +185,85 @@ const ElementoScreen = ({route, navigation}) => {
   const formatTime = time => {
     if (time != null) {
       const date = new Date(time);
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-      const formattedHours = hours % 12 || 12;
-      const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      return `${formattedHours}:${formattedMinutes} ${ampm}`;
+      return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
     }
     return time;
   };
 
+  const renderDatePicker = (
+    showPicker,
+    setShowPicker,
+    selectedDate,
+    setSelectedDate,
+    label,
+  ) => (
+    <View style={styles.rowContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          value={selectedDate.toISOString().split('T')[0]}
+          editable={false}
+        />
+        <TouchableOpacity
+          onPress={() => setShowPicker(true)}
+          style={styles.iconContainer}>
+          <Icon name="calendar" size={30} color="#888" />
+        </TouchableOpacity>
+      </View>
+      {showPicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowPicker(false);
+            if (selectedDate) {
+              setSelectedDate(selectedDate);
+              if (label === 'Fecha Inicio') {
+                handleSubmit();
+              }
+            }
+          }}
+        />
+      )}
+    </View>
+  );
+
+  const renderTimePicker = (
+    showPicker,
+    setShowPicker,
+    selectedTime,
+    setSelectedTime,
+    label,
+  ) => (
+    <View style={styles.timeInputsContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.timeInput}>{formatTime(selectedTime)}</Text>
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={() => setShowPicker(true)}>
+        <Icon name="clock-o" size={30} color="#888" />
+      </TouchableOpacity>
+      {showPicker && (
+        <DateTimePicker
+          value={selectedTime}
+          mode="time"
+          is24Hour={true}
+          display="default"
+          onChange={(event, selectedTime) => {
+            setShowPicker(false);
+            if (selectedTime) {
+              setSelectedTime(selectedTime);
+            }
+          }}
+        />
+      )}
+    </View>
+  );
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {loadingImages && (
         <View style={styles.imageContainer}>
           <Image
@@ -248,8 +275,8 @@ const ElementoScreen = ({route, navigation}) => {
       {images && images.length > 0 && (
         <Swiper
           style={styles.wrapper}
-          loop={true}
-          autoplay={true}
+          loop
+          autoplay
           autoplayTimeout={3}
           paginationStyle={{bottom: 10}}>
           {images.map(renderImage)}
@@ -296,139 +323,75 @@ const ElementoScreen = ({route, navigation}) => {
                 </View>
               </View>
               <View style={styles.infoGroup}>
-                <Text style={styles.infoLabel}>Horario :</Text>
+                <Text style={styles.infoLabel}>Horario:</Text>
                 <Text style={styles.infoText}>
                   {formatTime(elemento.hora_inicio_disponibilidad)} -{' '}
                   {formatTime(elemento.hora_fin_disponibilidad)}
                 </Text>
               </View>
-              <View>
-                <Button
-                  title="Seleccionar"
-                  onPress={() => setModalVisible(true)}
-                />
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={modalVisible}
-                  onRequestClose={() => {
-                    setModalVisible(false);
-                  }}>
-                  <View style={styles.centeredView}>
-                    <View
-                      style={{
-                        ...styles.modalView,
-                        width: '90%',
-                        maxHeight: Dimensions.get('window').height - 50,
-                      }}>
-                      <TouchableOpacity
-                        style={{position: 'relative', top: -5, right: -150}}
-                        onPress={() => setModalVisible(false)}>
-                        <Icon name="times" size={24} color="#000" />
-                      </TouchableOpacity>
-                      <View style={styles.rowContainer}>
-                        <Text style={styles.label}>Fecha</Text>
-                        <View style={styles.inputContainer}>
-                          <TextInput
-                            style={styles.input}
-                            value={selectedDate.toISOString().split('T')[0]}
-                            editable={false}
-                          />
-                          <TouchableOpacity
-                            onPress={() => setShowDatePicker(true)}
-                            style={styles.iconContainer}>
-                            <Icon name="calendar" size={30} color="#888" />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                      <HorariosDisponibles horarios={horariosDisponibles} />
-                      <View style={styles.timeInputsContainer}>
-                        <Text style={styles.label}>Hora Inicio</Text>
-                        <Text style={styles.timeInput}>
-                          {formatTime(startTime)}
-                        </Text>
-                        <TouchableOpacity
-                          style={styles.iconContainer}
-                          onPress={() => setShowStartTimePicker(true)}>
-                          <Icon name="clock-o" size={30} color="#888" />
-                        </TouchableOpacity>
-                      </View>
-                      <View style={styles.timeInputsContainer}>
-                        <Text style={styles.label}>Hora Fin</Text>
-                        <Text style={styles.timeInput}>
-                          {formatTime(endTime)}
-                        </Text>
-                        <TouchableOpacity
-                          style={styles.iconContainer}
-                          onPress={() => setShowEndTimePicker(true)}>
-                          <Icon name="clock-o" size={30} color="#888" />
-                        </TouchableOpacity>
-                      </View>
-
-                      {showDatePicker && (
-                        <DateTimePicker
-                          value={selectedDate}
-                          mode="date"
-                          display="default"
-                          onChange={(event, selectedDate) => {
-                            const currentDate = selectedDate || selectedDate;
-                            setShowDatePicker(false);
-                            setSelectedDate(currentDate);
-                            handleSubmit();
-                          }}
-                        />
-                      )}
-
-                      {showStartTimePicker && (
-                        <DateTimePicker
-                          value={startTime}
-                          mode="time"
-                          is24Hour={true}
-                          display="clock"
-                          onChange={(event, selectedTime) => {
-                            if (selectedTime !== undefined) {
-                              setStartTime(selectedTime);
-                            }
-                            setShowStartTimePicker(false);
-                          }}
-                        />
-                      )}
-
-                      {showEndTimePicker && (
-                        <DateTimePicker
-                          value={endTime}
-                          mode="time"
-                          is24Hour={true}
-                          display="clock"
-                          onChange={(event, selectedTime) => {
-                            if (selectedTime !== undefined) {
-                              setEndTime(selectedTime);
-                            }
-                            setShowEndTimePicker(false);
-                          }}
-                        />
-                      )}
-
-                      <TouchableOpacity
-                        style={{
-                          ...styles.openButton,
-                          backgroundColor: 'green',
-                          marginTop: 20,
-                        }}
-                        onPress={crearReserva}>
-                        <Text style={styles.textStyle}>Reservar</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </Modal>
-              </View>
+              <TouchableOpacity
+                style={styles.reserveButton}
+                onPress={() => setModalVisible(true)}>
+                <Text style={styles.reserveButtonText}>Reservar</Text>
+              </TouchableOpacity>
             </View>
           </>
         )}
       </Animatable.View>
-    </View>
+      <Modal
+        animationType="slide"
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}>
+              <Icon name="times" size={24} color="#000" />
+            </TouchableOpacity>
+            {renderDatePicker(
+              showStartDatePicker,
+              setShowStartDatePicker,
+              selectedStartDate,
+              setSelectedStartDate,
+              'Fecha Inicio',
+            )}
+            {renderDatePicker(
+              showEndDatePicker,
+              setShowEndDatePicker,
+              selectedEndDate,
+              setSelectedEndDate,
+              'Fecha Fin',
+            )}
+            <HorariosDisponibles horarios={horariosDisponibles} />
+            {renderTimePicker(
+              showStartTimePicker,
+              setShowStartTimePicker,
+              startTime,
+              setStartTime,
+              'Hora Inicio',
+            )}
+            {renderTimePicker(
+              showEndTimePicker,
+              setShowEndTimePicker,
+              endTime,
+              setEndTime,
+              'Hora Fin',
+            )}
+            <TouchableOpacity
+              style={styles.reserveButton}
+              onPress={crearReserva}>
+              <Text style={styles.reserveButtonText}>Confirmar Reserva</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
   );
 };
+
+// ... (previous code remains the same)
 
 const styles = StyleSheet.create({
   container: {
@@ -436,7 +399,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   imageContainer: {
-    flex: 1,
+    height: 300,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
@@ -446,10 +409,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 30,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
     elevation: 6,
@@ -461,17 +421,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   detailsContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    padding: 20,
     backgroundColor: '#fff',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     marginTop: -20,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -3,
-    },
+    shadowOffset: {width: 0, height: -3},
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
     elevation: 6,
@@ -485,7 +441,6 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     marginTop: 10,
-    paddingHorizontal: 20,
   },
   infoGroup: {
     flexDirection: 'row',
@@ -523,69 +478,32 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
-    margin: 20,
+    width: '90%',
+    maxHeight: Dimensions.get('window').height - 100,
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
   },
-  input: {
-    width: '70%',
-    height: 40,
-    marginVertical: 10,
-    borderWidth: 1,
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
     padding: 10,
-    borderColor: '#ccc',
-    borderRadius: 5,
-  },
-  timeInput: {
-    flex: 1,
-    height: 40,
-    marginHorizontal: 5,
-    borderWidth: 1,
-    padding: 10,
-    borderColor: '#ccc',
-    borderRadius: 5,
-  },
-  timeInputsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-
-  openButton: {
-    backgroundColor: '#F194FF',
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-    marginTop: 10,
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-
-  iconContainer: {
-    marginLeft: 10,
   },
   rowContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
+    width: '100%',
   },
   label: {
     width: 100,
@@ -597,6 +515,53 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  iconContainer: {
+    marginLeft: 10,
+    padding: 5,
+  },
+  timeInputsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+    width: '100%',
+  },
+  timeInput: {
+    flex: 1,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginHorizontal: 5,
+    textAlign: 'center',
+  },
+  reserveButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 25,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  reserveButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

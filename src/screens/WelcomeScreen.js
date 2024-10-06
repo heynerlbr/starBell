@@ -20,7 +20,7 @@ const WelcomeScreen = ({navigation}) => {
       <View style={styles.container}>
         <View style={styles.imageContainer}>
           <Image
-            source={require('../../assets/icon.png')}
+            source={require('../../assets/icon-removebg.png')}
             style={styles.icon}
           />
           <Text style={styles.title}>Bienvenido a StarBell</Text>
