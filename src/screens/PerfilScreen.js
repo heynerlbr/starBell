@@ -86,7 +86,7 @@ const Perfil = () => {
             <View style={styles.avatarContainer}>
               <Avatar
                 rounded
-                source={require('../images/acecard.png')}
+                source={require('../../assets/icon-removebg.png')}
                 size="xlarge"
               />
             </View>

@@ -36,10 +36,10 @@ const Navigation = () => {
             }}
           />
           <Tab.Screen
-            name="Lugares"
+            name="reservas"
             component={LugaresNavigation}
             options={{
-              tabBarLabel: 'Lugares',
+              tabBarLabel: 'reservas',
               tabBarIcon: ({color, size}) => (
                 <FontAwesome5 name="building" size={size} color={color} />
               ),
