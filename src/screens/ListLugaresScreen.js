@@ -7,9 +7,9 @@ import {
   StyleSheet,
   ImageBackground,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Para los iconos de estrella
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {urlRest, CLIENT_ID, CLIENT_SECRET, userProfile} from '../api/api';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Para obtener el ID del usuario
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ListLugaresScreen = ({route, navigation}) => {
   const [lugares, setLugares] = useState([]);
@@ -56,7 +56,7 @@ const ListLugaresScreen = ({route, navigation}) => {
 
   // Función para agregar/quitar favoritos
   const toggleFavorite = async lugarId => {
-    const userId = await AsyncStorage.getItem('userId'); // Obtén el ID del usuario logeado
+    const userId = await AsyncStorage.getItem('userId');
     if (!userId) {
       console.error('El ID del usuario no está disponible');
       return;
@@ -110,9 +110,20 @@ const ListLugaresScreen = ({route, navigation}) => {
       onPress={() => handleItemPress(item.id)}
       style={styles.itemContainer}>
       <View style={styles.itemContent}>
-        <Text style={styles.itemName}>{item.nombre}</Text>
-        <Text style={styles.itemAddress}>{item.direccion}</Text>
-        <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
+        <View style={styles.textContainer}>
+          <Text style={styles.itemName} numberOfLines={2} ellipsizeMode="tail">
+            {item.nombre}
+          </Text>
+          <Text
+            style={styles.itemAddress}
+            numberOfLines={1}
+            ellipsizeMode="tail">
+            {item.direccion}
+          </Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => toggleFavorite(item.id)}
+          style={styles.favoriteIcon}>
           <Icon
             name={favorites.includes(item.id) ? 'star' : 'star-o'}
             size={24}
@@ -150,10 +161,10 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   itemContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 15,
     borderRadius: 10,
-    padding: 20,
+    padding: 15,
     shadowColor: 'rgba(0, 0, 0, 0.2)',
     shadowOffset: {
       width: 0,
@@ -168,20 +179,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  textContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
   itemName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 5,
+    maxWidth: '90%',
   },
   itemAddress: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
+    maxWidth: '90%',
   },
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
+  },
+  favoriteIcon: {
+    marginLeft: 10,
   },
 });
 

@@ -1,11 +1,25 @@
-import React from "react";
-import { View, Text, FlatList, StyleSheet, Modal } from "react-native";
+import React from 'react';
+import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
 
-const HorariosDisponibles = ({ horarios, visible, onClose }) => {
-  const formatTime = (time) => {
-    const [hours, minutes] = time.split(":");
+const HorariosDisponibles = ({horarios, visible, onClose}) => {
+  // Validar que `horarios` es un array válido de objetos
+  console.log(horarios);
+
+  if (
+    !Array.isArray(horarios) ||
+    horarios.some(
+      item => typeof item.inicio !== 'string' || typeof item.fin !== 'string',
+    )
+  ) {
+    console.error('Datos de horarios no válidos:', horarios);
+    return <Text>Hubo un error con los horarios.</Text>;
+  }
+
+  // Función para formatear la hora al formato 12 horas con AM/PM
+  const formatTime = time => {
+    const [hours, minutes] = time.split(':');
     const hourInt = parseInt(hours, 10);
-    const suffix = hourInt >= 12 ? "PM" : "AM";
+    const suffix = hourInt >= 12 ? 'PM' : 'AM';
     const hour12 = hourInt % 12 || 12;
     return `${hour12}:${minutes} ${suffix}`;
   };
@@ -15,51 +29,43 @@ const HorariosDisponibles = ({ horarios, visible, onClose }) => {
       <Text style={styles.title}>Horarios Disponibles</Text>
       <FlatList
         data={horarios}
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <View style={styles.itemContainer}>
             <Text style={styles.itemText}>
               {formatTime(item.inicio)} - {formatTime(item.fin)}
             </Text>
           </View>
         )}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => index.toString()} // Asigna una clave única a cada elemento
       />
+      <Button title="Cerrar" onPress={onClose} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   modalContent: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
-    width: "80%",
-    maxHeight: "50%",
+    width: '80%',
+    maxHeight: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
-    textAlign: "center",
+    textAlign: 'center',
   },
   itemContainer: {
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: '#ccc',
     paddingVertical: 10,
   },
   itemText: {
     fontSize: 16,
-  },
-  closeButton: {
-    textAlign: "center",
-    color: "blue",
-    marginTop: 10,
   },
 });
 

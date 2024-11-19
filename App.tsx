@@ -4,7 +4,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import Navigation from './src/navigations/Navigation';
 import { AuthProvider } from './src/context/AuthContext'; // Asegúrate de ajustar la ruta
 
+
 function App() {
+
+
   return (
     <AuthProvider>
       <SafeAreaView style={styles.container}>

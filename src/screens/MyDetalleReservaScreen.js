@@ -136,39 +136,57 @@ const MyDetalleReservaScreen = ({route, navigation}) => {
         <View style={styles.container}>
           <Text style={styles.title}>Detalle de la Reserva</Text>
           <View style={styles.infoContainer}>
-            <Text style={styles.info}>
-              <Text style={styles.label}>Nombre del lugar:</Text>{' '}
-              {reserva.nombreLugar}
-            </Text>
-            <Text style={styles.info}>
-              <Text style={styles.label}>Dirección:</Text>{' '}
-              {reserva.direccionLugar}
-            </Text>
-            <Text style={styles.info}>
-              <Text style={styles.label}>Departamento:</Text>{' '}
-              {reserva.departamento}
-            </Text>
-            <Text style={styles.info}>
-              <Text style={styles.label}>Municipio:</Text> {reserva.municipio}
-            </Text>
-            <Text style={styles.info}>
-              <Text style={styles.label}>Fecha:</Text> {reserva.fecha}
-            </Text>
-            <Text style={styles.info}>
-              <Text style={styles.label}>Hora de inicio:</Text>{' '}
-              {reserva.hora_inicio}
-            </Text>
-            <Text style={styles.info}>
-              <Text style={styles.label}>Hora de fin:</Text> {reserva.hora_fin}
-            </Text>
-            <Text style={styles.info}>
-              <Text style={styles.label}>Estado:</Text> {reserva.estado}
-            </Text>
+            <View style={styles.row}>
+              <View style={styles.column}>
+                <Text style={styles.info}>
+                  <Text style={styles.label}>Nombre del lugar:</Text>{' '}
+                  {reserva.nombreLugar}
+                </Text>
+                <Text style={styles.info}>
+                  <Text style={styles.label}>Dirección:</Text>{' '}
+                  {reserva.direccionLugar}
+                </Text>
+                <Text style={styles.info}>
+                  <Text style={styles.label}>Departamento:</Text>{' '}
+                  {reserva.departamento}
+                </Text>
+                <Text style={styles.info}>
+                  <Text style={styles.label}>Municipio:</Text>{' '}
+                  {reserva.municipio}
+                </Text>
+              </View>
+              <View style={styles.column}>
+                <Text style={styles.info}>
+                  <Text style={styles.label}>Fecha Inicio:</Text>{' '}
+                  {reserva.fecha_inicio}
+                </Text>
+                <Text style={styles.info}>
+                  <Text style={styles.label}>Fecha Fin:</Text>{' '}
+                  {reserva.fecha_fin}
+                </Text>
+                <Text style={styles.info}>
+                  <Text style={styles.label}>Hora de inicio:</Text>{' '}
+                  {reserva.hora_inicio}
+                </Text>
+                <Text style={styles.info}>
+                  <Text style={styles.label}>Hora de fin:</Text>{' '}
+                  {reserva.hora_fin}
+                </Text>
+                <Text style={styles.info}>
+                  <Text style={styles.label}>Estado:</Text>{' '}
+                  {reserva.estado === 1
+                    ? 'Confirmado'
+                    : reserva.estado === 2
+                    ? 'Anulado'
+                    : 'Creado'}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
         {elemento && (
           <>
-            <Text style={styles.title}>{elemento.descripcion}</Text>
+            {/* <Text style={styles.title}>{elemento.descripcion}</Text> */}
             <View style={styles.infoContainer}>
               <View style={styles.infoGroup}>
                 <Text style={styles.infoLabel}>Capacidad:</Text>
@@ -201,8 +219,8 @@ const MyDetalleReservaScreen = ({route, navigation}) => {
               <View style={styles.infoGroup}>
                 <Text style={styles.infoLabel}>Horario :</Text>
                 <Text style={styles.infoText}>
-                  {formatTime(elemento.hora_inicio_disponibilidad)} -{' '}
-                  {formatTime(elemento.hora_fin_disponibilidad)}
+                  {elemento.hora_inicio_disponibilidad} -{' '}
+                  {elemento.hora_fin_disponibilidad}
                 </Text>
               </View>
             </View>
@@ -216,98 +234,105 @@ const MyDetalleReservaScreen = ({route, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#FAFBFC',
     paddingBottom: 20,
   },
   swiper: {
     height: Dimensions.get('window').width * 0.8,
-    marginTop: 20,
-    marginBottom: 30,
+    marginVertical: 20,
   },
   imageContainer: {
-    borderRadius: 20,
+    borderRadius: 15,
     overflow: 'hidden',
     marginHorizontal: 20,
-    marginTop: 20,
-    marginBottom: 30,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 8,
   },
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 20,
+    borderRadius: 15,
   },
   detailsContainer: {
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    paddingVertical: 30,
+    backgroundColor: '#FFF',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    marginTop: -20,
+    marginTop: -25,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -3,
-    },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
+    shadowOffset: {width: 0, height: -3},
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#333',
     textAlign: 'center',
   },
   infoContainer: {
+    flexDirection: 'column',
     marginTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#EEE',
+    paddingTop: 15,
   },
+
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10, // Para agregar espacio entre las columnas
+  },
+  column: {
+    flex: 1, // Asegura que las columnas se distribuyan de forma igual
+  },
+
   label: {
-    fontWeight: 'bold',
+    fontWeight: '700',
+    color: '#444',
+    fontSize: 16,
   },
   info: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 5,
+    fontSize: 15,
+    color: '#555',
+    marginBottom: 10,
+    lineHeight: 22,
   },
   infoGroup: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
+    justifyContent: 'space-between',
+    marginBottom: 15,
   },
   infoLabel: {
-    width: 100,
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#666',
+    fontWeight: '700',
+    color: '#333',
   },
   infoText: {
-    flex: 1,
     fontSize: 16,
-    color: '#666',
+    color: '#777',
   },
   daysContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 10,
+    marginTop: 10,
   },
   day: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 20,
+    marginRight: 15,
     marginBottom: 10,
   },
   daysLabel: {
+    fontSize: 15,
+    color: '#555',
     marginRight: 5,
-    fontSize: 16,
-    color: '#666',
   },
 });
 

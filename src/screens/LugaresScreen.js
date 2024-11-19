@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,14 @@ import {
   Animated,
   Button,
   ImageBackground,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import COLORS from "../constants/colors";
-import { urlRest, CLIENT_ID, CLIENT_SECRET } from "../api/api";
+} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import COLORS from '../constants/colors';
+import {urlRest, CLIENT_ID, CLIENT_SECRET} from '../api/api';
 
-const LugaresScreen = ({ navigation }) => {
-  const [queryMunicipio, setQueryMunicipio] = useState("");
-  const [queryReserva, setQueryReserva] = useState("");
+const LugaresScreen = ({navigation}) => {
+  const [queryMunicipio, setQueryMunicipio] = useState('');
+  const [queryReserva, setQueryReserva] = useState('');
   const [municipiosSugeridos, setMunicipiosSugeridos] = useState([]);
   const [selectedMunicipio, setSelectedMunicipio] = useState(null);
   const [selectedMunicipioId, setSelectedMunicipioId] = useState(null);
@@ -43,32 +43,32 @@ const LugaresScreen = ({ navigation }) => {
     }
   }, [selectedMunicipio]);
 
-  const fetchMunicipios = (query) => {
+  const fetchMunicipios = query => {
     if (query.length > 3) {
-      let urlapi = urlRest + "api/buscarMunicipios";
+      let urlapi = urlRest + 'api/buscarMunicipios';
       fetch(urlapi, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "X-Client-ID": CLIENT_ID,
-          "X-Client-Secret": CLIENT_SECRET,
+          'Content-Type': 'application/json',
+          'X-Client-ID': CLIENT_ID,
+          'X-Client-Secret': CLIENT_SECRET,
         },
-        body: JSON.stringify({ textoBusqueda: query }),
+        body: JSON.stringify({textoBusqueda: query}),
       })
-        .then((response) => response.json())
-        .then((data) => {
+        .then(response => response.json())
+        .then(data => {
           setMunicipiosSugeridos(data.municipios);
         })
-        .catch((error) => {
+        .catch(error => {
           console.error(
-            "Error al conectar con la API para obtener municipios:",
-            error
+            'Error al conectar con la API para obtener municipios:',
+            error,
           );
         });
     }
   };
 
-  const handleMunicipioQueryChange = (text) => {
+  const handleMunicipioQueryChange = text => {
     setQueryMunicipio(text);
     setSelectedMunicipio(null);
     setSelectedMunicipioId(null);
@@ -76,13 +76,13 @@ const LugaresScreen = ({ navigation }) => {
     setShowMunicipiosList(text.length > 0);
   };
 
-  const selectMunicipio = (municipioSeleccionado) => {
+  const selectMunicipio = municipioSeleccionado => {
     setShowMunicipiosList(false);
     setSelectedMunicipio(municipioSeleccionado.municipio);
     setSelectedMunicipioId(municipioSeleccionado.id_municipio);
   };
 
-  const renderMunicipioItem = ({ item }) => (
+  const renderMunicipioItem = ({item}) => (
     <TouchableOpacity style={styles.item} onPress={() => selectMunicipio(item)}>
       <Text style={styles.itemText}>
         {item.municipio}, {item.departamento}
@@ -90,45 +90,45 @@ const LugaresScreen = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-  const fetchReservas = (query) => {
+  const fetchReservas = query => {
     if (query.length > 0) {
-      let urlapi = urlRest + "api/buscarTiposResevas";
+      let urlapi = urlRest + 'api/buscarTiposResevas';
       fetch(urlapi, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "X-Client-ID": CLIENT_ID,
-          "X-Client-Secret": CLIENT_SECRET,
+          'Content-Type': 'application/json',
+          'X-Client-ID': CLIENT_ID,
+          'X-Client-Secret': CLIENT_SECRET,
         },
-        body: JSON.stringify({ textoBusqueda: query }),
+        body: JSON.stringify({textoBusqueda: query}),
       })
-        .then((response) => response.json())
-        .then((data) => {
+        .then(response => response.json())
+        .then(data => {
           setReservasSugeridos(data.reservas);
         })
-        .catch((error) => {
+        .catch(error => {
           console.error(
-            "Error al conectar con la API para obtener reservas:",
-            error
+            'Error al conectar con la API para obtener reservas:',
+            error,
           );
         });
     }
   };
 
-  const selectReserva = (reservaSeleccionado) => {
+  const selectReserva = reservaSeleccionado => {
     setSelectedReserva(reservaSeleccionado.nombre);
     setSelectedReservaId(reservaSeleccionado.id);
     setShowReservasList(false);
     setQueryReserva(reservaSeleccionado.nombre);
   };
 
-  const renderReservaItem = ({ item }) => (
+  const renderReservaItem = ({item}) => (
     <TouchableOpacity style={styles.item} onPress={() => selectReserva(item)}>
       <Text style={styles.itemText}>{item.nombre}</Text>
     </TouchableOpacity>
   );
 
-  const handleReservaQueryChange = (text) => {
+  const handleReservaQueryChange = text => {
     setQueryReserva(text);
     setSelectedReserva(null);
     setSelectedReservaId(null);
@@ -137,7 +137,7 @@ const LugaresScreen = ({ navigation }) => {
   };
 
   const goToNextScreen = () => {
-    navigation.navigate("ListLugares", {
+    navigation.navigate('ListLugares', {
       municipioId: selectedMunicipioId,
       reservaId: selectedReservaId,
     });
@@ -145,9 +145,8 @@ const LugaresScreen = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require("../../assets/imagenes/background.png")}
-      style={styles.backgroundImage}
-    >
+      source={require('../../assets/imagenes/background.png')}
+      style={styles.backgroundImage}>
       <SafeAreaView style={styles.container}>
         <View style={styles.formContainer}>
           <Text style={styles.label}>Buscar Municipio:</Text>
@@ -162,7 +161,7 @@ const LugaresScreen = ({ navigation }) => {
               <FlatList
                 data={municipiosSugeridos}
                 renderItem={renderMunicipioItem}
-                keyExtractor={(item) => item.id_municipio.toString()}
+                keyExtractor={item => item.id_municipio.toString()}
                 style={styles.list}
               />
             )}
@@ -180,7 +179,7 @@ const LugaresScreen = ({ navigation }) => {
               <FlatList
                 data={reservasSugeridos}
                 renderItem={renderReservaItem}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={item => item.id.toString()}
                 style={styles.list}
               />
             )}
@@ -193,8 +192,7 @@ const LugaresScreen = ({ navigation }) => {
                 styles.disabledButton,
             ]}
             onPress={goToNextScreen}
-            disabled={!(selectedMunicipioId && selectedReservaId)}
-          >
+            disabled={!(selectedMunicipioId && selectedReservaId)}>
             <Text style={styles.buttonText}>Filtrar</Text>
           </TouchableOpacity>
         </View>
@@ -208,7 +206,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   formContainer: {
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingHorizontal: 20,
     paddingTop: 20,
     borderRadius: 15,
@@ -216,7 +214,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
     color: COLORS.black,
   },
@@ -224,6 +222,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
+    color: 'black',
     height: 40,
     borderWidth: 1,
     borderColor: COLORS.black,
@@ -253,11 +252,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     padding: 15,
     borderRadius: 8,
-    alignItems: "center",
+    alignItems: 'center',
   },
   buttonText: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: COLORS.white,
   },
   disabledButton: {
@@ -265,8 +264,8 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
-    resizeMode: "cover",
-    justifyContent: "center",
+    resizeMode: 'cover',
+    justifyContent: 'center',
   },
 });
 

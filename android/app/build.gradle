@@ -90,6 +90,13 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+         release {
+            // Cambia 'my-release-key.jks' por el nombre de tu archivo keystore y asegúrate de que está en la raíz del proyecto.
+            storeFile file("../../my-release-key.jks")  // Cambia la ruta si es necesario
+            storePassword '123456'
+            keyAlias 'my-key-alias'  // El alias que definiste al crear el keystore
+            keyPassword '123456'
+        }
     }
     buildTypes {
         debug {
@@ -102,6 +109,7 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
+       
     }
     packagingOptions {
         resources {

@@ -43,7 +43,7 @@ const ListFavoritosScreen = ({navigation}) => {
       body: JSON.stringify({userId}),
     })
       .then(response => {
-        console.log('Response:', response); // Verificar respuesta antes de convertirla a JSON
+        // Verificar respuesta antes de convertirla a JSON
         return response.json();
       })
       .then(data => {

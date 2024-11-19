@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -47,6 +48,13 @@ const Login = ({navigation}) => {
         console.log('Login exitoso');
         loginA(data.user); // Actualiza el contexto con el usuario autenticado
         navigation.navigate('Perfil'); // Navegar a la pantalla del perfil
+      } else if (data.error && data.status === 'error') {
+        // Mostrar alert para credenciales inválidas
+        Alert.alert(
+          'Error de inicio de sesión',
+          'Las credenciales ingresadas no coinciden',
+          [{text: 'OK'}],
+        );
       } else {
         console.log('Error en el login', data.message);
       }
@@ -170,6 +178,7 @@ const styles = StyleSheet.create({
     color: COLORS.black,
   },
   input: {
+    color: 'black',
     height: 40,
     borderColor: COLORS.black,
     borderWidth: 1,
